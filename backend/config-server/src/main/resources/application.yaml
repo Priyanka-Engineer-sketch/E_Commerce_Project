@@ -12,31 +12,40 @@ spring:
     config:
       server:
         git:
-          uri: ${CONFIG_GIT_URI:https://github.com/your-org/your-config-repo}
+          # --- REQUIRED ---
+          uri: ${CONFIG_GIT_URI:https://github.com/your-org/your-config-repo.git}
           default-label: ${CONFIG_GIT_BRANCH:main}
           search-paths: ${CONFIG_GIT_PATHS:}
-          # For private repos (choose ONE method)
+          clone-on-start: true
+          # If GitHub Enterprise/self-signed, you can temporarily relax:
+          skip-ssl-validation: ${CONFIG_GIT_SKIP_SSL:false}
+
+          # --- AUTH: CHOOSE ONE METHOD BELOW ---
+
+          # (A) HTTPS with Personal Access Token (PAT)
+          # For GitHub: username = your GH username, password = PAT (repo read scope)
           username: ${CONFIG_GIT_USERNAME:}
           password: ${CONFIG_GIT_PASSWORD:}
-          # or SSH:
-          # private-key: ${CONFIG_GIT_SSH_KEY:}
-          clone-on-start: true
 
-  # Optional: protect the Config Server with Basic Auth
+          # (B) SSH key (comment A if you use this)
+          # private-key: ${CONFIG_GIT_SSH_KEY:}
+          # passphrase: ${CONFIG_GIT_SSH_PASSPHRASE:}
   security:
     user:
-      name: ${CONFIG_USER:config}
-      password: ${CONFIG_PASS:configpass}
+          name: ${CONFIG_USER:config}
+          password: ${CONFIG_PASS:configpass}
+
+# Optional: protect the Config Server itself with Basic Auth (clients must use it)
 
 # Optional symmetric encryption key for {cipher} values in the repo
 encrypt:
   key: ${CONFIG_ENCRYPT_KEY:}
 
-# Logging for the Config Server itself
 logging:
   level:
     root: INFO
     org.springframework: INFO
+    org.eclipse.jgit: INFO
 
 management:
   endpoints:
@@ -63,16 +72,11 @@ spring:
   config:
     activate:
       on-profile: native
-
   cloud:
     config:
       server:
         native:
-          # Point to your local repo folder (absolute or relative)
           search-locations: ${CONFIG_NATIVE_DIR:./config-repo}
 
-# Keep same port and security when using native (inherits unless overridden)
 server:
   port: 8888
-
-# (Optional) You can override anything here for native profile if needed
