@@ -40,7 +40,6 @@ spring:
   security:
     require-email-verified: false
     auto-verify-on-register: true
-
     oauth2:
       client:
         registration:
@@ -63,15 +62,14 @@ spring:
 
 eureka:
   client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
     healthcheck:
       enabled: true
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
   instance:
     prefer-ip-address: true
-    # unique per instance; survives restarts thanks to random.value fallback
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
     lease-renewal-interval-in-seconds: 10
     lease-expiration-duration-in-seconds: 30
@@ -97,19 +95,14 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{cid}] %logger{36} - %msg%n"
 
-# JWT config (keep only ONE block after you align with your code)
+# Single source of truth for JWT (HS256)
 app:
   jwt:
-    secret: ${JWT_ACCESS_SECRET:change-me-512-bits}          # if your JwtService reads app.jwt.secret
+    secret: ${JWT_ACCESS_SECRET:change-me-512-bits}
     access-exp-seconds: 900
     refresh-exp-seconds: 604800
-
-ecomm:
-  jwt:
-    access-secret: ${JWT_ACCESS_SECRET:change-me-512-bits}   # old keys you used
-    refresh-secret: ${JWT_REFRESH_SECRET:change-me-512-bits}
-    access-minutes: 15
-    refresh-days: 7
+    issuer: ecomm-user-service
+    audience: ecomm-clients
 
 # -------------- DEV PROFILE (Postgres) --------------
 ---
@@ -132,12 +125,6 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
-
-# If you want to prevent registration during dev, uncomment:
-# eureka:
-#   client:
-#     register-with-eureka: false
-#     fetch-registry: false
 
 # -------------- TEST PROFILE (H2 in-memory) --------------
 ---
@@ -165,14 +152,11 @@ spring:
     config:
       enabled: false
 
-# In tests we don't need Eureka; just don't register/fetch.
-# (Leaving eureka.client.enabled unspecified keeps auto-config harmless.)
 eureka:
   client:
     register-with-eureka: false
     fetch-registry: false
 
-# Disable RBAC seeding during tests
 app:
   seed:
     rbac: false
