@@ -8,9 +8,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="config-server" />
-        <module name="ecom-discovery-server" />
         <module name="ecom-gateway" />
+        <module name="catalog-service" />
+        <module name="product-service" />
+        <module name="ecom-discovery-server" />
         <module name="user-service" />
+        <module name="order-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -19,9 +22,12 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="catalog-service" options="-parameters" />
       <module name="config-server" options="" />
       <module name="ecom-discovery-server" options="-parameters" />
       <module name="ecom-gateway" options="" />
+      <module name="order-service" options="-parameters" />
+      <module name="product-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
   </component>

@@ -34,6 +34,7 @@ public class SecurityConfig {
             // user auth endpoints
             "/api/users/register",
             "/api/users/login",
+            "/api/users/{userId}/profile",
             "/api/users/refresh",
             "/api/users/verify-email",
             "/api/users/resend-verification",
