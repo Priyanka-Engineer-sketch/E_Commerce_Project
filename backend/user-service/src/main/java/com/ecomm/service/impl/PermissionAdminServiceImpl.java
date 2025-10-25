@@ -10,6 +10,8 @@ import com.ecomm.repository.PermissionRepository;
 import com.ecomm.service.PermissionAdminService;
 import com.ecomm.util.PermissionMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
     private final PermissionRepository permissionRepo;
 
     @Override
+    @CacheEvict(value = {"permissions", "permissionsList"}, allEntries = true)
     public PermissionResponse create(CreatePermissionRequest req) {
         String name = req.getName().trim();
         if (permissionRepo.existsByNameIgnoreCase(name)) {
@@ -38,6 +41,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
     }
 
     @Override
+    @CacheEvict(value = {"permissions", "permissionsList"}, allEntries = true)
     public PermissionResponse update(Long id, UpdatePermissionRequest req) {
         Permission p = permissionRepo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Permission not found"));
@@ -58,6 +62,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
     }
 
     @Override
+    @CacheEvict(value = {"permissions", "permissionsList"}, allEntries = true)
     public void delete(Long id) {
         Permission p = permissionRepo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Permission not found"));
@@ -72,6 +77,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
     }
 
     @Override @Transactional(readOnly = true)
+    @Cacheable(value = "permissions", key = "#id")
     public PermissionResponse get(Long id) {
         return permissionRepo.findById(id)
                 .map(PermissionMapper::toResponse)
@@ -79,6 +85,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
     }
 
     @Override @Transactional(readOnly = true)
+    @Cacheable(value = "permissionsList", key = "{#q, #pageable.pageNumber, #pageable.pageSize}")
     public PageResponse<PermissionResponse> list(String q, Pageable pageable) {
         Page<Permission> page = (q == null || q.isBlank())
                 ? permissionRepo.findAll(pageable)

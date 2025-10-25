@@ -1,8 +1,22 @@
+#services:
+#  redis:
+#    image: redis:7-alpine
+#    container_name: ecomm-redis
+#    ports:
+#      - "6379:6379"
+#    command: ["redis-server", "--appendonly", "yes"]
+#    restart: unless-stopped
 services:
+  user-service:
+    build: .
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+
   redis:
     image: redis:7-alpine
     container_name: ecomm-redis
     ports:
       - "6379:6379"
-    command: ["redis-server", "--appendonly", "yes"]
-    restart: unless-stopped

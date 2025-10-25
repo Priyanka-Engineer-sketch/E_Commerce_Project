@@ -14,6 +14,8 @@ import com.ecomm.repository.UserRepository;
 import com.ecomm.service.AuthService;
 import com.ecomm.util.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
     private final SecurityFlags flags;
 
     @Override
+    @CacheEvict(value = "usersByEmail", key = "#req.email")
     public AuthResponse register(RegisterRequest req) {
         if (userRepository.existsByEmailIgnoreCase(req.getEmail())) {
             throw new UserAlreadyExistsException("Email already registered");
@@ -61,6 +64,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @CacheEvict(value = "usersByEmail", key = "#req.email")
     public UserResponse registerUser(RegisterRequest req) {
         if (userRepository.existsByEmailIgnoreCase(req.getEmail())) {
             throw new UserAlreadyExistsException("Email already registered");
@@ -109,6 +113,12 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Refresh token expired");
         }
         return buildTokens(user);
+    }
+
+    @Cacheable(value = "usersByEmail", key = "#email") // ✅ cache user by email
+    public User loadUserByEmail(String email) {
+        return userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     // ===== helpers =====

@@ -14,6 +14,8 @@ import com.ecomm.repository.UserRepository;
 import com.ecomm.service.UserSelfService;
 import com.ecomm.util.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,6 +37,7 @@ public class UserSelfServiceImpl implements UserSelfService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "currentUser", key = "T(com.ecomm.config.security.util.SecurityUtils).currentUserEmail()")
     public UserResponse getCurrentUser() {
         User user = requireCurrent();
         events.publishEvent(new AccountStatusChangedEvent(user.getId(), user.getEmail(), user.getIsActive()));
@@ -42,6 +45,7 @@ public class UserSelfServiceImpl implements UserSelfService {
     }
 
     @Override
+    @CacheEvict(value = "currentUser", key = "T(com.ecomm.config.security.util.SecurityUtils).currentUserEmail()")
     public UserResponse updateCurrentUser(SelfUpdateRequest req) {
         User u = requireCurrent();
         if (req.getUsername() != null) u.setUsername(req.getUsername());
@@ -67,6 +71,7 @@ public class UserSelfServiceImpl implements UserSelfService {
     }
 
     @Override
+    @CacheEvict(value = "currentUser", key = "T(com.ecomm.config.security.util.SecurityUtils).currentUserEmail()")
     public void changePassword(ChangePasswordRequest req) {
         User user = requireCurrent();
         if (!passwordEncoder.matches(req.getOldPassword(), user.getPasswordHash()))
@@ -76,6 +81,7 @@ public class UserSelfServiceImpl implements UserSelfService {
     }
 
     @Override
+    @CacheEvict(value = "currentUser", key = "T(com.ecomm.config.security.util.SecurityUtils).currentUserEmail()")
     public UserResponse patchStatus(boolean active) {
         User u = requireCurrent();
         u.setIsActive(active);

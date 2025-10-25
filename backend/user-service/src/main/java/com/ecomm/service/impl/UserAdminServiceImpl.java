@@ -14,6 +14,8 @@ import com.ecomm.repository.UserRepository;
 import com.ecomm.service.UserAdminService;
 import com.ecomm.util.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,8 @@ public class UserAdminServiceImpl implements UserAdminService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @CacheEvict(value = {"users", "usersList"}, allEntries = true)
+    // Clear caches after new user creation
     public UserResponse create(AdminCreateUserRequest req) {
         if (userRepo.existsByEmailIgnoreCase(req.getEmail()))
             throw new IllegalArgumentException("Email already in use");
@@ -50,6 +54,8 @@ public class UserAdminServiceImpl implements UserAdminService {
     }
 
     @Override
+    @CacheEvict(value = {"users", "usersList"}, allEntries = true)
+    //  Clear caches after update
     public UserResponse update(Long id, UpdateUserRequest req) {
         User user = userRepo.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
         if (req.getUsername() != null) user.setUsername(req.getUsername());
@@ -65,6 +71,8 @@ public class UserAdminServiceImpl implements UserAdminService {
     }
 
     @Override
+    @CacheEvict(value = {"users", "usersList"}, allEntries = true)
+    //  Clear caches when user deleted
     public void delete(Long id) {
         if (!userRepo.existsById(id)) throw new NoSuchElementException("User not found");
         userRepo.deleteById(id);
@@ -72,6 +80,8 @@ public class UserAdminServiceImpl implements UserAdminService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "users", key = "#id")
+    // Cache user by ID
     public UserResponse get(Long id) {
         User user = userRepo.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
         return UserMapper.toResponse(user);
@@ -79,6 +89,7 @@ public class UserAdminServiceImpl implements UserAdminService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "usersList", key = "{#query, #pageable.pageNumber, #pageable.pageSize}")
     public PageResponse<UserResponse> list(String query, Pageable pageable) {
         Page<User> page = (query == null || query.isBlank())
                 ? userRepo.findAll(pageable)
@@ -95,6 +106,7 @@ public class UserAdminServiceImpl implements UserAdminService {
     }
 
     @Override
+    @CacheEvict(value = {"users", "usersList"}, allEntries = true)
     public UserResponse assignRoles(Long id, AssignRolesRequest req) {
         User user = userRepo.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
         Set<Role> roles = resolveRoles(req.getRoles());
@@ -103,6 +115,7 @@ public class UserAdminServiceImpl implements UserAdminService {
     }
 
     @Override
+    @CacheEvict(value = {"users", "usersList"}, allEntries = true)
     public UserResponse patchStatus(Long id, StatusPatchRequest req) {
         User user = userRepo.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
         user.setIsActive(req.getActive());
