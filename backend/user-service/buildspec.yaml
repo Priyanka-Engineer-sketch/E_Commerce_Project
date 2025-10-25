@@ -4,7 +4,7 @@ phases:
   pre_build:
     commands:
       - echo Running Maven build...
-      - mvn -f backend/user-service/pom.xml clean install
+      - mvn -f backend/user-service/pom.xml clean package -DskipTests
       - echo Logging in to Amazon ECR...
       - aws --version
       - REPOSITORY_URI=269825205626.dkr.ecr.ap-south-1.amazonaws.com/e-commerce
@@ -36,4 +36,4 @@ phases:
 artifacts:
   files:
     - imagedefinitions.json
-    - backend/user-service/target/user-service.jar
+    - target/user-service.jar
