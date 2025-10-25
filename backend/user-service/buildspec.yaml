@@ -36,4 +36,4 @@ phases:
 artifacts:
   files:
     - imagedefinitions.json
-    - backend/user-service/target/*.jar
+    - backend/user-service/target/user-service.jar
