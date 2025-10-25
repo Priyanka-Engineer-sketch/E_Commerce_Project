@@ -3,8 +3,6 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - echo Entering backend/user-service directory
-      - cd backend/user-service
       - echo Running Maven build...
       - mvn clean install
       - echo Logging in to Amazon ECR...
@@ -17,7 +15,6 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - cd backend/user-service
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
