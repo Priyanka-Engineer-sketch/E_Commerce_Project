@@ -1,0 +1,49 @@
+ecommerce-web/
+├─ public/
+│  ├─ icons/manifest-icons.png ...
+│  └─ manifest.json
+├─ src/
+│  ├─ app/
+│  │  ├─ (storefront)/
+│  │  │  ├─ layout.tsx
+│  │  │  ├─ page.tsx                 # Home
+│  │  │  ├─ search/page.tsx          # Search + filters
+│  │  │  ├─ p/[slug]/page.tsx        # PDP
+│  │  │  ├─ cart/page.tsx
+│  │  │  ├─ checkout/page.tsx
+│  │  │  ├─ orders/page.tsx
+│  │  │  ├─ profile/page.tsx
+│  │  ├─ admin/                      # Admin-only (RBAC)
+│  │  │  ├─ page.tsx                 # Dashboard
+│  │  │  ├─ users/page.tsx
+│  │  │  ├─ products/page.tsx
+│  │  │  ├─ shipments/page.tsx
+│  │  │  └─ analytics/page.tsx
+│  │  ├─ seller/                     # Seller-only (RBAC)
+│  │  │  ├─ page.tsx
+│  │  │  └─ products/page.tsx
+│  │  ├─ api/
+│  │  │  ├─ auth/[...nextauth]/route.ts # NextAuth
+│  │  │  ├─ checkout/stripe/route.ts    # Stripe session
+│  │  │  ├─ shipments/[orderId]/route.ts# mock tracking
+│  │  │  └─ search/index/route.ts       # AI search (in-memory)
+│  │  ├─ not-found.tsx
+│  │  └─ global-error.tsx
+│  ├─ components/
+│  │  ├─ layout/{Header.tsx,Footer.tsx}
+│  │  ├─ common/{EmptyState.tsx,ErrorView.tsx,DataTable.tsx}
+│  │  ├─ product/{ProductCard.tsx,ProductGrid.tsx,VariantPicker.tsx}
+│  │  ├─ forms/{ProductForm.tsx,UserForm.tsx}
+│  │  ├─ analytics/{KpiCards.tsx,SalesChart.tsx}
+│  │  └─ hoc/withRole.tsx
+│  ├─ hooks/{useDebounce.ts,usePermission.ts,useAIRecommendations.ts}
+│  ├─ lib/{apiClient.ts,config.ts,logger.ts,permissions.ts,events.ts,seo.ts}
+│  ├─ store/{index.ts,rootSaga.ts,slices/*,sagas/*}
+│  ├─ styles/{globals.css,bootstrap-overrides.scss}
+│  ├─ types/{models.ts,rbac.ts}
+│  └─ utils/{currency.ts,validators.ts,date.ts}
+├─ next.config.mjs
+├─ next-sitemap.config.js
+├─ middleware.ts
+├─ .env.example
+└─ README.md

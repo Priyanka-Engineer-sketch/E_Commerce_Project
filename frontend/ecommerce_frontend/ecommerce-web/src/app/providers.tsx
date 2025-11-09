@@ -1,0 +1,16 @@
+'use client';
+import { Provider } from 'react-redux';
+import { SessionProvider } from 'next-auth/react';
+import { Toaster } from 'react-hot-toast';
+import {store} from "@/app/store";
+
+export default function Providers({ children }: { children: React.ReactNode }) {
+    return (
+        <SessionProvider>
+            <Provider store={store}>
+                {children}
+                <Toaster />
+            </Provider>
+        </SessionProvider>
+    );
+}

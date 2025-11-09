@@ -1,0 +1,48 @@
+npx create-next-app@latest ecommerce-web --ts --eslint --src-dir --app --import-alias "@/*"
+cd ecommerce-web
+
+# UI + State + Forms
+npm i bootstrap react-bootstrap @reduxjs/toolkit react-redux redux-saga classnames zod react-hook-form
+
+# Auth (JWT via Auth.js/NextAuth) + Providers
+npm i next-auth
+npm i -D @types/node
+
+# PWA
+npm i next-pwa
+
+# Charts
+npm i recharts
+
+# Payments (Stripe example)
+npm i stripe
+
+# Notifications & support
+npm i react-hot-toast
+
+# i18n
+npm i next-intl
+
+# Analytics/monitoring
+npm i @sentry/nextjs
+
+# AI (client-side)
+npm i @tensorflow/tfjs @tensorflow-models/universal-sentence-encoder
+
+# Search (lightweight BM25)
+npm i elasticlunr
+
+# Sitemap/robots
+npm i next-sitemap
+
+# Testing (later)
+npm i -D jest @testing-library/react @testing-library/jest-dom @testing-library/user-event playwright ts-jest
+
+15) Monitoring & logging
+
+Sentry quick init
+
+npx @sentry/wizard -i nextjs
+
+
+Set DSN in .env. Add server logs to CloudWatch/Datadog when deploying to AWS (or Vercel analytics).

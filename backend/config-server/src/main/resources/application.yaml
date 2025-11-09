@@ -1,5 +1,5 @@
 # =========================
-# DEFAULT: Git-backed Config Server
+# Spring Cloud Config Server (runs on 8888)
 # =========================
 server:
   port: 8888
@@ -11,40 +11,44 @@ spring:
   cloud:
     config:
       server:
+        # --------- CHOOSE ONE BACKEND: HTTPS (PAT) OR SSH ---------
         git:
-          # --- REQUIRED ---
-          uri: ${CONFIG_GIT_URI:https://github.com/your-org/your-config-repo.git}
+          # (A) HTTPS + PAT (recommended if you don't want SSH)
+          # uri is overridden by env: CONFIG_GIT_URI
+          uri: ${CONFIG_GIT_URI:https://github.com/Priyanka-Engineer-sketch/ecom-config.git}
           default-label: ${CONFIG_GIT_BRANCH:main}
           search-paths: ${CONFIG_GIT_PATHS:}
           clone-on-start: true
-          # If GitHub Enterprise/self-signed, you can temporarily relax:
           skip-ssl-validation: ${CONFIG_GIT_SKIP_SSL:false}
+          timeout: ${CONFIG_GIT_TIMEOUT:20}
+          force-pull: ${CONFIG_GIT_FORCE_PULL:true}
+          delete-untracked-branches: true
+          username: ${CONFIG_GIT_USERNAME:}    # leave empty if using SSH
+          password: ${CONFIG_GIT_PASSWORD:}    # supply via secret manager (do not commit)
 
-          # --- AUTH: CHOOSE ONE METHOD BELOW ---
-
-          # (A) HTTPS with Personal Access Token (PAT)
-          # For GitHub: username = your GH username, password = PAT (repo read scope)
-          username: ${CONFIG_GIT_USERNAME:}
-          password: ${CONFIG_GIT_PASSWORD:}
-
-          # (B) SSH key (comment A if you use this)
+          # (B) SSH (uncomment these if you switch to SSH)
+          # uri: git@github.com:Priyanka-Engineer-sketch/ecom-config.git
           # private-key: ${CONFIG_GIT_SSH_KEY:}
           # passphrase: ${CONFIG_GIT_SSH_PASSPHRASE:}
-  security:
-    user:
-          name: ${CONFIG_USER:config}
-          password: ${CONFIG_PASS:configpass}
+          # ignore-local-ssh-settings: ${CONFIG_GIT_IGNORE_LOCAL_SSH:true}
+          # strict-host-key-checking: ${CONFIG_GIT_STRICT_HOST_KEY:true}
+          # host-key: ${CONFIG_GIT_HOST_KEY:}
+          # host-key-algorithm: ${CONFIG_GIT_HOST_KEY_ALGO:}
 
-# Optional: protect the Config Server itself with Basic Auth (clients must use it)
+# Basic auth for Config Server endpoints (optional)
+security:
+  user:
+    name: ${CONFIG_USER:config}
+    password: ${CONFIG_PASS:configpass}
 
-# Optional symmetric encryption key for {cipher} values in the repo
+# Enable {cipher} support for CLIENT configs stored in ecom-config repo
 encrypt:
-  key: ${CONFIG_ENCRYPT_KEY:}
+  key: ${CONFIG_ENCRYPT_KEY:}   # supply via secret; do NOT commit plaintext
 
 logging:
   level:
     root: INFO
-    org.springframework: INFO
+    org.springframework.cloud.config.server: INFO
     org.eclipse.jgit: INFO
 
 management:
@@ -52,8 +56,12 @@ management:
     web:
       exposure:
         include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
 
-# Eureka (optional)
+# Optional: don’t register config-server itself in Eureka
 eureka:
   client:
     register-with-eureka: ${EUREKA_REGISTER:false}
@@ -63,11 +71,11 @@ eureka:
   instance:
     prefer-ip-address: true
 
----
 # =========================
-# NATIVE PROFILE: Local folder backend
+# Native profile (local folder backend)
 # Activate with: --spring.profiles.active=native
 # =========================
+---
 spring:
   config:
     activate:
@@ -76,10 +84,8 @@ spring:
     config:
       server:
         native:
-          search-locations: ${CONFIG_NATIVE_DIR:./config-repo}
+          search-locations:
+            - ${CONFIG_NATIVE_DIR:./config-repo}
 
 server:
   port: 8888
-
-
-
