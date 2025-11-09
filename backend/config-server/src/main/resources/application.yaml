@@ -1,5 +1,6 @@
 # =========================
 # Spring Cloud Config Server (runs on 8888)
+# DEFAULT: HTTPS + PAT  (start with: no profile → falls back to https via activate.on-profile: default)
 # =========================
 server:
   port: 8888
@@ -8,14 +9,26 @@ spring:
   application:
     name: config-server
 
+  security:
+    user:
+      name: ${CONFIG_USER:config}
+      password: ${CONFIG_PASS:configpass}
+
+# ---------- PROFILE: HTTPS + PAT  ----------
+# Activate implicitly as default (no profile) OR explicitly with: --spring.profiles.active=https
+---
+spring:
+  config:
+    activate:
+      on-profile: https,default
   cloud:
     config:
       server:
-        # --------- CHOOSE ONE BACKEND: HTTPS (PAT) OR SSH ---------
         git:
-          # (A) HTTPS + PAT (recommended if you don't want SSH)
-          # uri is overridden by env: CONFIG_GIT_URI
           uri: ${CONFIG_GIT_URI:https://github.com/Priyanka-Engineer-sketch/ecom-config.git}
+          # MUST be a GitHub PAT (NOT your account password)
+          username: ${CONFIG_GIT_USERNAME:}
+          password: ${CONFIG_GIT_PASSWORD:}
           default-label: ${CONFIG_GIT_BRANCH:main}
           search-paths: ${CONFIG_GIT_PATHS:}
           clone-on-start: true
@@ -23,25 +36,7 @@ spring:
           timeout: ${CONFIG_GIT_TIMEOUT:20}
           force-pull: ${CONFIG_GIT_FORCE_PULL:true}
           delete-untracked-branches: true
-          username: ${CONFIG_GIT_USERNAME:}    # leave empty if using SSH
-          password: ${CONFIG_GIT_PASSWORD:}    # supply via secret manager (do not commit)
 
-          # (B) SSH (uncomment these if you switch to SSH)
-          # uri: git@github.com:Priyanka-Engineer-sketch/ecom-config.git
-          # private-key: ${CONFIG_GIT_SSH_KEY:}
-          # passphrase: ${CONFIG_GIT_SSH_PASSPHRASE:}
-          # ignore-local-ssh-settings: ${CONFIG_GIT_IGNORE_LOCAL_SSH:true}
-          # strict-host-key-checking: ${CONFIG_GIT_STRICT_HOST_KEY:true}
-          # host-key: ${CONFIG_GIT_HOST_KEY:}
-          # host-key-algorithm: ${CONFIG_GIT_HOST_KEY_ALGO:}
-
-# Basic auth for Config Server endpoints (optional)
-security:
-  user:
-    name: ${CONFIG_USER:config}
-    password: ${CONFIG_PASS:configpass}
-
-# Enable {cipher} support for CLIENT configs stored in ecom-config repo
 encrypt:
   key: ${CONFIG_ENCRYPT_KEY:}   # supply via secret; do NOT commit plaintext
 
@@ -61,7 +56,6 @@ management:
       probes:
         enabled: true
 
-# Optional: don’t register config-server itself in Eureka
 eureka:
   client:
     register-with-eureka: ${EUREKA_REGISTER:false}
@@ -71,10 +65,61 @@ eureka:
   instance:
     prefer-ip-address: true
 
-# =========================
-# Native profile (local folder backend)
-# Activate with: --spring.profiles.active=native
-# =========================
+# ---------- PROFILE: SSH (INLINE PEM) ----------
+# Use when you want to pass the key CONTENTS via env var (works best on Windows).
+# Start with: --spring.profiles.active=ssh-inline
+---
+spring:
+  config:
+    activate:
+      on-profile: ssh-inline
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${CONFIG_GIT_URI:git@github.com:Priyanka-Engineer-sketch/ecom-config.git}
+          # IMPORTANT: This must be the ACTUAL PEM text (BEGIN/END) with \n newlines
+          # Example (PowerShell): setx CONFIG_GIT_SSH_KEY_PEM "-----BEGIN RSA PRIVATE KEY-----`n...`n-----END RSA PRIVATE KEY-----"
+          privateKey: ${CONFIG_GIT_SSH_KEY_PEM:}
+          passphrase: ${CONFIG_GIT_SSH_PASSPHRASE:}
+          ignoreLocalSshSettings: ${CONFIG_GIT_IGNORE_LOCAL_SSH:true}
+          strictHostKeyChecking: ${CONFIG_GIT_STRICT_HOST_KEY:false}
+          hostKey: ${CONFIG_GIT_HOST_KEY:}
+          hostKeyAlgorithm: ${CONFIG_GIT_HOST_KEY_ALGO:}
+          default-label: ${CONFIG_GIT_BRANCH:main}
+          search-paths: ${CONFIG_GIT_PATHS:}
+          clone-on-start: true
+          timeout: ${CONFIG_GIT_TIMEOUT:20}
+          force-pull: ${CONFIG_GIT_FORCE_PULL:true}
+          delete-untracked-branches: true
+
+# ---------- PROFILE: SSH (USE ~/.ssh & known_hosts) ----------
+# Works if your key is in the default location (e.g., C:\Users\Admin\.ssh\id_rsa in PEM format)
+# and known_hosts contains GitHub (ssh-rsa entry).
+# Start with: --spring.profiles.active=ssh-home
+---
+spring:
+  config:
+    activate:
+      on-profile: ssh-home
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${CONFIG_GIT_URI:git@github.com:Priyanka-Engineer-sketch/ecom-config.git}
+          # Let JGit read ~/.ssh/id_rsa and ~/.ssh/known_hosts
+          ignoreLocalSshSettings: false
+          # If you insist on strict checking, set true and provide hostKey/hostKeyAlgorithm
+          strictHostKeyChecking: ${CONFIG_GIT_STRICT_HOST_KEY:false}
+          default-label: ${CONFIG_GIT_BRANCH:main}
+          search-paths: ${CONFIG_GIT_PATHS:}
+          clone-on-start: true
+          timeout: ${CONFIG_GIT_TIMEOUT:20}
+          force-pull: ${CONFIG_GIT_FORCE_PULL:true}
+          delete-untracked-branches: true
+
+# ---------- PROFILE: Native (local folder backend) ----------
+# Start with: --spring.profiles.active=native
 ---
 spring:
   config:
@@ -89,3 +134,11 @@ spring:
 
 server:
   port: 8888
+
+
+#Generate key in PEM (RSA) format:
+#  ssh-keygen -t rsa -b 4096 -m PEM -C "config-server" -f $env:USERPROFILE\.ssh\config-server-rsa -N ""
+#  Add config-server-rsa.pub as a Deploy key (Read-only) to the repo.
+#Put private key contents into env var with \n line breaks:
+#  $pem = [IO.File]::ReadAllText("$env:USERPROFILE\.ssh\config-server-rsa") -replace "`r?`n","`n"
+#  setx CONFIG_GIT_SSH_KEY_PEM $pem
