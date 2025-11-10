@@ -39,17 +39,18 @@
   </dependencyManagement>
 
   <modules>
-    <module>user-service</module>
+    <module>services/user-service</module>
 <!--    <module>catalog-service</module>-->
 <!--    <module>order-service</module>-->
 <!--    <module>inventory-service</module>-->
 <!--    <module>notification-service</module>-->
 <!--    <module>offers-loyalty-service</module>-->
 <!--    <module>analytics-service</module>-->
-    <module>ecom-gateway</module>
-    <module>ecom-discovery-server</module>
-    <module>config-server</module>
-<!--    <module>admin-server</module>-->
+    <module>platform/ecom-gateway</module>
+    <module>platform/ecom-discovery-server</module>
+    <module>platform/config-server</module>
+      <module>libs/commons-security</module>
+      <module>libs/commons-messaging</module>
   </modules>
 
   <build>

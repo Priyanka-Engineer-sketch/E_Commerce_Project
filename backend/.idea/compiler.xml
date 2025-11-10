@@ -9,21 +9,30 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
         <module name="config-server" />
-        <module name="ecom-gateway" />
-        <module name="catalog-service" />
-        <module name="product-service" />
+        <module name="commons-security" />
         <module name="ecom-discovery-server" />
         <module name="user-service" />
-        <module name="order-service" />
+        <module name="commons-messaging" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="catalog-service" target="17" />
+      <module name="commons-api" target="17" />
+      <module name="libs" target="17" />
+      <module name="order-service" target="17" />
+      <module name="product-service" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="catalog-service" options="-parameters" />
+      <module name="commons-api" options="-parameters" />
+      <module name="commons-messaging" options="-parameters" />
+      <module name="commons-security" options="-parameters" />
       <module name="config-server" options="" />
       <module name="ecom-discovery-server" options="-parameters" />
       <module name="ecom-gateway" options="" />
+      <module name="libs" options="-parameters" />
       <module name="order-service" options="-parameters" />
       <module name="product-service" options="-parameters" />
       <module name="user-service" options="-parameters" />

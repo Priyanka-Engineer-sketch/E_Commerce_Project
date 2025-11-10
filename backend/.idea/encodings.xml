@@ -5,8 +5,13 @@
     <file url="file://$PROJECT_DIR$/config-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ecom-discovery-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ecom-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/libs/commons-messaging/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/libs/commons-security/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/libs/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/order-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/platform/ecom-discovery-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/product-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/user-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/user-service/src/main/java" charset="UTF-8" />
