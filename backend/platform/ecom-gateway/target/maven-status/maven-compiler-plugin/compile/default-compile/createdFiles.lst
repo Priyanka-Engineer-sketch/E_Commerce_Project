@@ -1,0 +1,10 @@
+com\ecomm\config\KeyResolvers.class
+com\ecomm\filter\JwtAuthGatewayFilterFactory$KeyFamily.class
+com\ecomm\filter\JwtAuthGatewayFilterFactory.class
+com\ecomm\filter\Bucket4jRateLimiterGatewayFilterFactory$Config.class
+com\ecomm\filter\CorrelationIdFilter.class
+com\ecomm\gateway\EcommerceGatewayApplication.class
+com\ecomm\filter\JwtAuthGatewayFilterFactory$Config.class
+com\ecomm\filter\Bucket4jRateLimiterGatewayFilterFactory.class
+com\ecomm\config\SecurityConfig.class
+com\ecomm\web\FallbackController.class

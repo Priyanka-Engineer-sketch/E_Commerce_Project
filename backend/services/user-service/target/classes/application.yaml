@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: user-service
+  config:
+    import: "optional:configserver:"   # URL comes from SPRING_CONFIG_IMPORT
+  datasource:
+    url: jdbc:postgresql://localhost:${DB_PORT:5432}/ecommerce_userdb
+    username: ${DB_USER:postgres}
+    password: ${DB_PASS:admin}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      # password: ${REDIS_PASSWORD:}
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+
+security:
+  jwt:
+    access:
+      secret: ${JWT_ACCESS_SECRET:CHANGE_ME}
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USER}     # e.g. your Gmail address
+    password: ${MAIL_PASS}     # the App Password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
