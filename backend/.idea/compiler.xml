@@ -7,20 +7,20 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="api-gateway" />
-        <module name="config-server" />
         <module name="commons-security" />
-        <module name="ecom-discovery-server" />
-        <module name="user-service" />
         <module name="commons-messaging" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="api-gateway" target="17" />
       <module name="catalog-service" target="17" />
       <module name="commons-api" target="17" />
+      <module name="config-server" target="1.8" />
+      <module name="ecom-discovery-server" target="17" />
       <module name="libs" target="17" />
       <module name="order-service" target="17" />
       <module name="product-service" target="17" />
+      <module name="user-service" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
